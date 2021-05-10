@@ -13,6 +13,7 @@ import subprocess
 import re
 from typing import List, Optional
 
+import pickle
 import click
 import dnnlib
 import numpy as np
@@ -414,12 +415,17 @@ def generate_images(
             PIL.Image.fromarray(img[0].cpu().numpy(), 'RGB').save(f'{outdir}/seed{seed:04d}.png')
 
             # Generate neighbors
+            s_random = {}
             for s in range(num_samples):
                 random = np.random.uniform(-diameter, diameter, [1, 512])
+                s_random[s] = random
                 new_z = torch.from_numpy(np.clip(np.add(z_seed, random), -1, 1)).to(device)
                 img = G(new_z, label, truncation_psi=truncation_psi, noise_mode=noise_mode)
                 img = (img.permute(0, 2, 3, 1) * 127.5 + 128).clamp(0, 255).to(torch.uint8)
                 PIL.Image.fromarray(img[0].cpu().numpy(), 'RGB').save(f'{outdir}/seed{seed:04d}_{s:02d}.png')
+
+            # Write random numbers in pickle
+            pickle.dump(s_random, open(f'{outdir}/random.pkl', 'wb'))
 
     elif (process == 'interpolation' or process == 'interpolation-truncation'):
         # create path for frames
