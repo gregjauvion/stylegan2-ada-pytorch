@@ -30,7 +30,7 @@ class StyleGAN2Loss(Loss):
         self.augment_pipe = augment_pipe
         self.style_mixing_prob = style_mixing_prob
         self.r1_gamma = r1_gamma
-        self.pl_batch_shrink = pl_batch_shrink
+        self.pl_batch_shrink = pl_batch_shrink #1
         self.pl_decay = pl_decay
         self.pl_weight = pl_weight
         self.pl_mean = torch.zeros([], device=device)
